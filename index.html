@@ -300,31 +300,62 @@ function renderResult(){
 
     <div class="info-grid">
 
-      <div class="info-card settings">
-        <h3>⚙️ 呼吸器設定值<br>(Control Settings)</h3>
-        ${tags(row.settings)}
-      </div>
+  <!-- 1. 呼吸器設定值 -->
+  <div class="info-card settings">
 
-      <div class="info-card alarms">
-        <h3>🔔 警示設定<br>(Alarm Limits)</h3>
-        ${tags(row.alarms)}
-      </div>
+    <h3>
+      ⚙️ 呼吸器設定值<br>
+      (Control Settings)
+    </h3>
 
-      <div class="info-card measurements">
-        <h3>📊 臨床監測數據<br>(Measurements)</h3>
-        <div class="text-box">
+    ${tags(row.settings)}
+
+  </div>
+
+
+  <!-- 2. 臨床監測數據 -->
+  <div class="info-card measurements">
+
+    <h3>
+      📊 臨床監測數據<br>
+      (Measurements)
+    </h3>
+
+    <div class="text-box">
 ${escapeHtml(row.measurements || "尚無資料")}
-        </div>
-      </div>
-
-      <div class="info-card assessment">
-        <h3>🩺 理學與臨床評估<br>(Physical Assessment)</h3>
-        <div class="text-box">
-${escapeHtml(row.assessment || "尚無資料")}
-        </div>
-      </div>
-
     </div>
+
+  </div>
+
+
+  <!-- 3. 警示設定 -->
+  <div class="info-card alarms">
+
+    <h3>
+      🔔 警示設定<br>
+      (Alarm Limits)
+    </h3>
+
+    ${tags(row.alarms)}
+
+  </div>
+
+
+  <!-- 4. 理學與臨床評估 -->
+  <div class="info-card assessment">
+
+    <h3>
+      🩺 理學與臨床評估<br>
+      (Physical Assessment)
+    </h3>
+
+    <div class="text-box">
+${escapeHtml(row.assessment || "尚無資料")}
+    </div>
+
+  </div>
+
+</div>
 
     <div class="data-note">
       已載入呼吸器主資料庫，共 ${DATA.length} 筆 Device × Mode 對照資料
