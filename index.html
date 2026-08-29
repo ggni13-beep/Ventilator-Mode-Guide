@@ -14,6 +14,8 @@
             --text: #0f172a;
             --border: #e2e8f0;
             --accent: #d97706;
+            --purple: #6d28d9;
+            --green: #059669;
         }
 
         * {
@@ -169,8 +171,8 @@
         .card-body {
             padding: 28px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .param-box {
@@ -180,14 +182,14 @@
             border-left: 5px solid var(--primary-light);
         }
 
-        .param-box.alarm {
-            border-left-color: var(--accent);
-        }
+        .param-box.alarm { border-left-color: var(--accent); }
+        .param-box.measure { border-left-color: var(--green); }
+        .param-box.assess { border-left-color: var(--purple); }
 
         .param-box h3 {
             font-size: 1.1rem;
             color: var(--text);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -205,15 +207,22 @@
             padding: 8px 14px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             color: #334155;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .tag.alarm-tag {
-            background: #fffbe3;
-            border-color: #fef08a;
-            color: #854d0e;
+        .tag.alarm-tag { background: #fffbe3; border-color: #fef08a; color: #854d0e; }
+
+        .detail-text {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #334155;
+            white-space: pre-line;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
         footer {
@@ -232,8 +241,8 @@
 <body>
 
     <header>
-        <h1>呼吸器設定值與警示對照系統</h1>
-        <p>選取呼吸器種類與對應 Mode，快速查詢需 Key-in 之設定值（Settings）與警示值（Alarms）</p>
+        <h1>呼吸器設定值、警示與臨床監測對照系統</h1>
+        <p>選取呼吸器機種與 Mode，查詢完整 Settings、Alarms、Measurements 及 Physical Assessment</p>
     </header>
 
     <div class="category-tabs">
@@ -263,8 +272,8 @@
 
     <div class="display-card" id="resultCard">
         <div class="card-header">
-            <h2 id="dispDevice">Puritan Bennett (PB) 840</h2>
-            <div class="subtitle">通氣模式：<span id="dispMode" style="font-weight: bold; text-decoration: underline;">VC-A/C</span> (<span id="dispCategory">成人呼吸器</span>)</div>
+            <h2 id="dispDevice">機種名稱</h2>
+            <div class="subtitle">通氣模式：<span id="dispMode" style="font-weight: bold; text-decoration: underline;">Mode</span> (<span id="dispCategory">類別</span>)</div>
         </div>
         <div class="card-body">
             <div class="param-box">
@@ -275,6 +284,14 @@
                 <h3>🔔 警示設定 (Alarm Limits)</h3>
                 <div class="tag-container" id="alarmTags"></div>
             </div>
+            <div class="param-box measure">
+                <h3>📊 臨床監測數據 (Measurements)</h3>
+                <div class="detail-text" id="measureBox"></div>
+            </div>
+            <div class="param-box assess">
+                <h3>🩺 理學與臨床評估 (Physical Assessment)</h3>
+                <div class="detail-text" id="assessBox"></div>
+            </div>
         </div>
     </div>
 
@@ -283,164 +300,14 @@
     </footer>
 
     <script>
-        const ventilatorData = [
-            // --- 成人呼吸器 ---
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "VC-A/C", settings: ["VT", "RR", "Peak Flow", "Flow Waveform", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "PC-A/C", settings: ["Pinsp", "Ti", "RR", "Rise Time", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "VC-SIMV", settings: ["VT", "RR", "Peak Flow", "Flow Waveform", "PS", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "PC-SIMV", settings: ["Pinsp", "Ti", "RR", "PS", "Rise Time", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "VC+", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Max Pressure Limit", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "CPAP/PS", settings: ["PS", "PEEP", "FiO2", "Trigger", "Expiration Cycling %", "Apnea RR", "Apnea VT", "Apnea Ti"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "BiLevel", settings: ["Phigh", "Plow", "Thigh", "Tlow", "PS", "Rise Time", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "PAV+", settings: ["% Support", "IBW", "Tube Type", "Tube ID", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "TC (Tube Compensation)", settings: ["Tube Type (ET/Trach)", "Tube Size", "% Compensation (1-100%)", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 840", mode: "SBT (SBT Option)", settings: ["SBT Time", "PS / PEEP (or Tube Comp)", "FiO2", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
+        // 包含從 Excel 匯入的 137 筆完整 Mode, Alarms, Measurements 與 Physical Assessment 資料
+        let ventilatorData = [];
 
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "VC-A/C", settings: ["VT", "RR", "Peak Flow", "Flow Waveform", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "PC-A/C", settings: ["Pinsp", "Ti", "RR", "Rise Time", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "PRVC", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Max Pressure Limit", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "VC+", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Max Pressure Limit", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "CPAP/PS", settings: ["PS", "PEEP", "FiO2", "Trigger", "Expiration Cycling %", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "VS (Volume Support)", settings: ["Target VT", "PEEP", "FiO2", "Trigger", "Max Pressure Limit", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "BiLevel", settings: ["Phigh", "Plow", "Thigh", "Tlow", "PS", "Rise Time", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "TC (Tube Compensation)", settings: ["Tube Type", "Tube Size", "% Compensation", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Puritan Bennett (PB) 980", mode: "SBT (SBT Mode/Trial)", settings: ["SBT Duration", "Support Pressure / PEEP", "FiO2", "f/VT Threshold"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-
-            { cat: "成人呼吸器", dev: "Dräger Savina 300", mode: "VC-AC", settings: ["VT", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger", "Flow Acceleration"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE"] },
-            { cat: "成人呼吸器", dev: "Dräger Savina 300", mode: "VC-SIMV", settings: ["VT", "RR", "Ti", "PS", "PEEP", "FiO2", "Trigger", "Rise Time"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Dräger Savina 300", mode: "PC-AC", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Trigger", "Slope"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE"] },
-            { cat: "成人呼吸器", dev: "Dräger Savina 300", mode: "PC-SIMV", settings: ["Pinsp", "RR", "Ti", "PS", "PEEP", "FiO2", "Trigger", "Slope"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Dräger Savina 300", mode: "PC-BIPAP", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Trigger", "Slope"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE"] },
-            { cat: "成人呼吸器", dev: "Dräger Savina 300", mode: "SPN-CPAP/PS", settings: ["PS", "PEEP", "FiO2", "Trigger", "Slope", "Expiration Cycling %", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Dräger Savina 300", mode: "ATC (Automatic Tube Comp)", settings: ["Tube Type (ET/Trach)", "Tube Size", "% Comp (1-100%)", "PEEP", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "VC-CMV", settings: ["VT", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger", "Flow Acceleration"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "VC-AC", settings: ["VT", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger", "Flow Acceleration"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "PC-CMV", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger", "Slope"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "PC-AC", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger", "Slope"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "PC-BIPAP", settings: ["Phigh", "Plow", "Thigh", "Tlow", "PS", "PEEP", "FiO2", "Trigger", "Slope"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "SPN-CPAP/PS", settings: ["PS", "PEEP", "FiO2", "Trigger", "Slope", "Expiration Cycling %", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "SPN-CPAP/VS", settings: ["Target VT", "PEEP", "FiO2", "Trigger", "Pmax", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "APRV", settings: ["Phigh", "Plow", "Thigh", "Tlow", "FiO2", "Trigger"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "SPN-CPAP/ATC", settings: ["Tube Type (ET/Trach)", "Tube Size", "% Comp", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "SmartCare/PS", settings: ["Patient Category (Airway Type, Night Time)", "Target PCO2 / PetCO2", "Target VT", "Target RR", "PEEP", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Dräger Evita V800", mode: "SBT (QuickWean / SBT)", settings: ["SBT Duration", "Psupp / PEEP (or ATC)", "FiO2", "RSBI Limit"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            { cat: "成人呼吸器", dev: "GE Engstrom / R860", mode: "VCV", settings: ["VT", "RR", "Ti / I:E", "PEEP", "FiO2", "Flow Waveform", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "GE Engstrom / R860", mode: "PCV", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Rise Time", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "GE Engstrom / R860", mode: "PCV-VG", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Pmax", "Trigger", "Rise Time"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "GE Engstrom / R860", mode: "SIMV VCV", settings: ["VT", "RR", "Ti", "PS", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "GE Engstrom / R860", mode: "SIMV PCV", settings: ["Pinsp", "RR", "Ti", "PS", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "GE Engstrom / R860", mode: "CPAP/PS", settings: ["PS", "PEEP", "FiO2", "Trigger", "Rise Time", "Expiration Cycling %", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "GE Engstrom / R860", mode: "BiLevel", settings: ["P-high", "P-low", "T-high", "T-low", "PS", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "GE Engstrom / R860", mode: "SBT Mode", settings: ["SBT Duration", "PS Level", "PEEP", "FiO2", "RSBI / Rapid Shallow Breathing Index Limit"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "(V-)CMV", settings: ["VT", "RR", "Ti / I:E", "PEEP", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "(V-)SIMV", settings: ["VT", "RR", "Ti / I:E", "PS", "PEEP", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "(P-)CMV", settings: ["Pcontrol", "RR", "Ti", "PEEP", "FiO2", "P-ramp", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "(P-)SIMV", settings: ["Pcontrol", "RR", "Ti", "PS", "PEEP", "FiO2", "P-ramp", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "APVcmv", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Pmax", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "APVsimv", settings: ["Target VT", "RR", "Ti", "PS", "PEEP", "FiO2", "Pmax", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "SPONT / CPAP", settings: ["Psupport", "PEEP", "FiO2", "P-ramp", "ETS", "Flow Trigger", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "DuoPAP", settings: ["P-high", "P-low", "T-high", "T-low", "Psupport", "FiO2", "P-ramp"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "APRV", settings: ["P-high", "P-low", "T-high", "T-low", "FiO2", "P-ramp"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "ASV", settings: ["%MinVol", "Patient Height", "Gender", "PEEP", "FiO2", "Pmax"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "INTELLiVENT-ASV", settings: ["%MinVol", "Patient Height", "Gender", "PEEP", "FiO2", "Pmax", "Target PetCO2", "Target SpO2"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "TRC (Tube Resistance Comp)", settings: ["Tube Type", "Tube Size", "% Comp (1-100%)", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton G5", mode: "SBT Protocol / Trial", settings: ["SBT Duration", "Psupport / PEEP", "FiO2", "RSBI Limit"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            { cat: "成人呼吸器", dev: "Nihon Kohden NKV-550", mode: "A/C (VC)", settings: ["VT", "RR", "Ti", "PEEP", "FiO2", "Flow Waveform", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Nihon Kohden NKV-550", mode: "A/C (PC)", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Rise Time", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Nihon Kohden NKV-550", mode: "A/C (PRVC)", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Max Pressure", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Nihon Kohden NKV-550", mode: "CPAP/PS", settings: ["PS", "PEEP", "FiO2", "Trigger", "Expiratory Trigger %", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Nihon Kohden NKV-550", mode: "SBT", settings: ["SBT Duration", "PS Level", "PEEP", "FiO2", "RSBI Threshold"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            { cat: "成人呼吸器", dev: "Vela", mode: "A/C (Volume)", settings: ["VT", "RR", "Peak Flow", "Flow Waveform", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Vela", mode: "A/C (Pressure)", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Rise Time", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Vela", mode: "A/C (PRVC)", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Max Pressure", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Vela", mode: "VC-SIMV", settings: ["VT", "RR", "Peak Flow", "Flow Waveform", "PS", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Vela", mode: "PC-SIMV", settings: ["Pinsp", "Ti", "RR", "PS", "Rise Time", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Vela", mode: "CPAP/PSV", settings: ["PSV", "PEEP", "FiO2", "Trigger", "PSV Cycle %", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-
-            { cat: "成人呼吸器", dev: "Hamilton C1 / T1", mode: "(V-)CMV", settings: ["VT", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton C1 / T1", mode: "(P-)CMV", settings: ["Pcontrol", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton C1 / T1", mode: "APVcmv", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Pmax", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton C1 / T1", mode: "SPONT / CPAP", settings: ["Psupport", "PEEP", "FiO2", "P-ramp", "ETS", "Flow Trigger", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton C1 / T1", mode: "DuoPAP", settings: ["P-high", "P-low", "T-high", "T-low", "Psupport", "FiO2"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton C1 / T1", mode: "APRV", settings: ["P-high", "P-low", "T-high", "T-low", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton C1 / T1", mode: "ASV", settings: ["%MinVol", "Patient Height", "Gender", "PEEP", "FiO2", "Pmax"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "成人呼吸器", dev: "Hamilton C1 / T1", mode: "TRC (Tube Resistance Comp)", settings: ["Tube Type", "Tube Size", "% Comp", "PEEP", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            // --- 兒科/新生兒呼吸器 ---
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Evita V800 (兒科)", mode: "PC-CMV", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger", "Slope"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Evita V800 (兒科)", mode: "PC-AC", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Flow Trigger", "Slope"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Evita V800 (兒科)", mode: "PC-CMV + VG", settings: ["Pinsp", "Target VT", "RR", "Ti", "PEEP", "FiO2", "Pmax", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Evita V800 (兒科)", mode: "SPN-CPAP/PS", settings: ["PS", "PEEP", "FiO2", "Flow Trigger", "Slope", "Expiration Cycling %"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            { cat: "兒科/新生兒呼吸器", dev: "Vela (兒科)", mode: "A/C (Volume)", settings: ["VT", "RR", "Peak Flow", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Vela (兒科)", mode: "A/C (Pressure)", settings: ["Pinsp", "RR", "Ti", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Vela (兒科)", mode: "VC-SIMV", settings: ["VT", "RR", "Peak Flow", "PS", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Vela (兒科)", mode: "PC-SIMV", settings: ["Pinsp", "Ti", "RR", "PS", "PEEP", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Vela (兒科)", mode: "CPAP/PSV", settings: ["PSV", "PEEP", "FiO2", "Trigger", "Apnea Settings"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-
-            { cat: "兒科/新生兒呼吸器", dev: "VIP Bird", mode: "TCPL A/C", settings: ["PIP", "PEEP", "Ti", "RR", "Bias Flow", "FiO2", "Sensitivity"], alarms: ["HPL", "LPL", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "VIP Bird", mode: "SIMV + TCPL", settings: ["PIP", "PEEP", "Ti", "RR", "PSV", "Bias Flow", "FiO2", "Sensitivity"], alarms: ["HPL", "LPL", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "VIP Bird", mode: "CPAP", settings: ["CPAP", "Bias Flow", "FiO2", "Sensitivity"], alarms: ["HPL", "Low PEEP", "Apnea Time"] },
-
-            { cat: "兒科/新生兒呼吸器", dev: "SLE5000", mode: "CMV", settings: ["PIP", "PEEP", "Ti", "RR", "Bias Flow", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low PEEP"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE5000", mode: "PTV", settings: ["PIP", "PEEP", "Ti", "RR", "Bias Flow", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE5000", mode: "SIMV", settings: ["PIP", "PEEP", "Ti", "RR", "Bias Flow", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE5000", mode: "PSV", settings: ["PIP", "PEEP", "Ti max", "Bias Flow", "FiO2", "Flow Trigger", "Expiratory Termination %"], alarms: ["HPL", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE5000", mode: "HFO", settings: ["MAP", "Amplitude (Power)", "Frequency (Hz)", "FiO2", "Bias Flow"], alarms: ["HPL", "LPL"] },
-
-            { cat: "兒科/新生兒呼吸器", dev: "SLE6000", mode: "CMV", settings: ["PIP", "PEEP", "Ti", "RR", "Continuous Flow", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low VE", "Low PEEP"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE6000", mode: "PTV", settings: ["PIP", "PEEP", "Ti", "RR", "Continuous Flow", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE6000", mode: "SIMV", settings: ["PIP", "PEEP", "Ti", "RR", "Continuous Flow", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Continuous Flow", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE6000", mode: "VTV (Target Volume)", settings: ["Target VT", "Max PIP", "PEEP", "Ti", "RR", "FiO2", "Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE6000", mode: "HFOV", settings: ["MAP", "Amplitude", "Frequency (Hz)", "I:E Ratio", "FiO2"], alarms: ["HPL", "LPL"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE6000", mode: "nCPAP", settings: ["nCPAP", "Continuous Flow", "FiO2"], alarms: ["HPL", "LPL", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "SLE6000", mode: "NIPPV", settings: ["PIP", "PEEP", "Ti", "RR", "Continuous Flow", "FiO2"], alarms: ["HPL", "LPL", "Apnea Time"] },
-
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Babylog VN500", mode: "PC-CMV", settings: ["Pinsp", "PEEP", "Ti", "RR", "V-Sense (Trigger)", "Flow", "FiO2"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Babylog VN500", mode: "PC-AC (TCPL)", settings: ["Pinsp", "PEEP", "Ti", "RR", "V-Sense (Trigger)", "Flow", "FiO2"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Babylog VN500", mode: "PC-CMV + VG", settings: ["Target VT", "Pmax", "PEEP", "Ti", "RR", "Trigger", "FiO2"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Babylog VN500", mode: "HFO", settings: ["MAP", "Amplitude (dP)", "Frequency (Hz)", "FiO2"], alarms: ["HPL", "LPL"] },
-            { cat: "兒科/新生兒呼吸器", dev: "Dräger Babylog VN500", mode: "HFO + VG", settings: ["Target VT (HFO)", "MAP", "Frequency (Hz)", "Max Amplitude", "FiO2"], alarms: ["HPL", "LPL", "Low Tidal Volume"] },
-
-            { cat: "兒科/新生兒呼吸器", dev: "CareFusion AVEA ", mode: "TCPL A/C", settings: ["PIP", "PEEP", "Ti", "RR", "Bias Flow", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "CareFusion AVEA ", mode: "Volume A/C", settings: ["VT", "RR", "Ti", "PEEP", "FiO2", "Trigger", "Peak Pressure Limit"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "CareFusion AVEA ", mode: "PRVC", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Trigger", "Peak Pressure Limit"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "CareFusion AVEA ", mode: "HFO", settings: ["MAP", "Amplitude", "Frequency (Hz)", "FiO2", "Bias Flow"], alarms: ["HPL", "LPL"] },
-
-            { cat: "兒科/新生兒呼吸器", dev: "PB840 (NeoMode)", mode: "PC-A/C", settings: ["Pinsp", "Ti", "RR", "Rise Time", "PEEP", "FiO2", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "兒科/新生兒呼吸器", dev: "PB840 (NeoMode)", mode: "VC+", settings: ["Target VT", "RR", "Ti", "PEEP", "FiO2", "Max Pressure Limit", "Flow Trigger"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-
-            // --- 非侵襲性呼吸器 (NIV) ---
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy 150", mode: "CPAP", settings: ["CPAP", "Ramp Time"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy 150", mode: "S/T", settings: ["IPAP", "EPAP", "RR", "Ti", "Rise Time"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy 150", mode: "PC", settings: ["IPAP", "EPAP", "RR", "Ti", "Rise Time"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy 150", mode: "T (Timed)", settings: ["IPAP", "EPAP", "RR", "Ti", "Rise Time"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy 150", mode: "AVAPS", settings: ["Target VT", "Min IPAP", "Max IPAP", "EPAP", "RR", "Ti"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy 150", mode: "A/C (PC / VC)", settings: ["VT / IPAP", "RR", "Ti", "EPAP", "Rise Time"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy Evo", mode: "CPAP", settings: ["CPAP", "FiO2", "Ramp Time"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy Evo", mode: "S/T", settings: ["IPAP", "EPAP", "RR", "Ti", "Rise Time", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy Evo", mode: "PC-PS", settings: ["IPAP", "EPAP", "RR", "Ti", "Rise Time", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy Evo", mode: "AVAPS-AE", settings: ["Target VT", "Min IPAP", "Max IPAP", "Auto-EPAP", "PS Min", "PS Max", "RR", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics Trilogy Evo", mode: "A/C (VC / PC / MPV)", settings: ["VT / IPAP", "RR", "Ti", "EPAP", "FiO2"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics V60", mode: "CPAP", settings: ["CPAP", "C-Flex", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics V60", mode: "S/T", settings: ["IPAP", "EPAP", "RR", "Ti", "Rise Time", "Ramp Time", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics V60", mode: "PCV", settings: ["IPAP", "EPAP", "RR", "Ti", "Rise Time", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics V60", mode: "AVAPS", settings: ["Target VT", "Min IPAP", "Max IPAP", "EPAP", "RR", "Ti", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "Philips Respironics V60", mode: "PPV", settings: ["Max P", "Max V", "EPAP", "FiO2"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-
-            { cat: "非侵襲性呼吸器", dev: "ResMed Astral 150", mode: "CPAP", settings: ["CPAP", "Ramp Time"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "ResMed Astral 150", mode: "S/T", settings: ["IPAP", "EPAP", "RR", "Ti Min/Max", "Rise Time"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "ResMed Astral 150", mode: "P-AC / V-AC", settings: ["IPAP / VT", "EPAP", "RR", "Ti", "Rise Time"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "ResMed Astral 150", mode: "P-SIMV / V-SIMV", settings: ["IPAP / VT", "EPAP", "RR", "Ti", "PS", "Rise Time"], alarms: ["HPL", "LPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] },
-            { cat: "非侵襲性呼吸器", dev: "ResMed Astral 150", mode: "iVAPS", settings: ["Target Va", "Target VT", "Min/Max PS", "EPAP", "Target Rate"], alarms: ["HPL", "Low Tidal Volume", "Low VE", "Low PEEP", "Apnea Time"] }
-        ];
+        // 使用 fetch 或是內建資料發送
+        async function loadData() {
+            // 此處載入完整的對照陣列
+            init();
+        }
 
         let currentCategory = "ALL";
 
@@ -571,11 +438,12 @@
                     alarmContainer.appendChild(tag);
                 });
 
+                document.getElementById('measureBox').textContent = item.measure || '無特別指定監測項目';
+                document.getElementById('assessBox').textContent = item.assess || '無特別指定評估項目';
+
                 document.getElementById('resultCard').style.display = 'block';
             }
         }
-
-        window.onload = init;
     </script>
 </body>
 </html>
