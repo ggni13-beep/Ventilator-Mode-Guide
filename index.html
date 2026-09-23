@@ -5,6 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RT Clinical Quality Dashboard｜呼吸器設定對照</title>
 <style>
+:root{
+  --blue:#0b5cab;
+  --blue2:#eaf3ff;
+  --line:#d9e2ec;
+  --text:#1f2937;
+  --muted:#64748b;
+  --bg:#f5f7fa;
+  --white:#ffffff;
+  --green:#16834b;
+  --orange:#d97706;
+  --red:#c62828;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,"Microsoft JhengHei",sans-serif;
+  color:var(--text);
+  background:var(--bg);<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RT Clinical Quality Dashboard｜呼吸器設定對照</title>
+<style>
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",Arial,sans-serif;background:#f4f6f8;color:#334155;line-height:1.6}
@@ -187,3 +211,263 @@ render();
 </script>
 </body>
 </html>
+}
+header{
+  background:linear-gradient(135deg,#084f91,#0b6fbd);
+  color:#fff;
+  padding:22px 28px;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
+}
+header h1{
+  margin:0;
+  font-size:26px;
+  font-weight:700;
+}
+header p{
+  margin:7px 0 0;
+  font-size:14px;
+  opacity:.92;
+}
+.container{
+  max-width:1500px;
+  margin:0 auto;
+  padding:22px;
+}
+.tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.tab{
+  border:1px solid #cbd5e1;
+  background:#fff;
+  color:#334155;
+  border-radius:8px;
+  padding:10px 18px;
+  cursor:pointer;
+  font-weight:600;
+}
+.tab.active{
+  background:var(--blue);
+  color:#fff;
+  border-color:var(--blue);
+}
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:18px;
+  box-shadow:0 1px 3px rgba(15,23,42,.05);
+}
+.panel-title{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:14px;
+}
+.selector-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+}
+.label{
+  font-weight:700;
+  margin-right:4px;
+}
+select{
+  min-width:240px;
+  padding:10px 12px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  background:#fff;
+  font-size:15px;
+}
+.pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.pill{
+  border:1px solid #cbd5e1;
+  background:#fff;
+  color:#334155;
+  border-radius:999px;
+  padding:7px 13px;
+  cursor:pointer;
+  font-size:13px;
+}
+.pill:hover{
+  border-color:#7aaee3;
+  background:#f4f9ff;
+}
+.pill.active{
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#fff;
+}
+.result-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.result-title{
+  font-size:22px;
+  font-weight:700;
+}
+.badges{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.badge{
+  background:#eef5fc;
+  color:#14558f;
+  border:1px solid #cfe1f3;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:13px;
+  font-weight:600;
+}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+}
+.card{
+  border:1px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+  background:#fff;
+}
+.card h3{
+  margin:0;
+  padding:12px 14px;
+  background:var(--blue2);
+  color:#124f88;
+  font-size:17px;
+  border-bottom:1px solid #d7e5f3;
+}
+.card-body{
+  padding:12px 14px;
+}
+.item{
+  display:grid;
+  grid-template-columns:minmax(150px,34%) 1fr;
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px dashed #e2e8f0;
+}
+.item:last-child{
+  border-bottom:none;
+}
+.item-key{
+  font-weight:700;
+  color:#334155;
+}
+.item-value{
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.empty{
+  color:#94a3b8;
+  font-style:italic;
+}
+.note{
+  margin-top:14px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+footer{
+  text-align:center;
+  color:#64748b;
+  font-size:12px;
+  padding:22px;
+}
+@media(max-width:900px){
+  .cards{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+  header{padding:18px}
+  header h1{font-size:21px}
+  .container{padding:12px}
+  .panel{padding:14px}
+  select{width:100%;min-width:0}
+  .item{
+    grid-template-columns:1fr;
+    gap:4px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>RT Clinical Quality Dashboard｜呼吸器設定對照</h1>
+  <p>Ventilator Mode / Settings / Alarms / Measurements / Physical Assessment Reference</p>
+</header>
+
+<div class="container">
+
+  <div class="tabs" id="groupTabs"></div>
+
+  <div class="panel">
+    <div class="panel-title">① 選擇呼吸器</div>
+
+    <div class="selector-row">
+      <span class="label">機型：</span>
+      <select id="deviceSelect"></select>
+    </div>
+
+    <div class="pills" id="devicePills"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">② 選擇 Mode</div>
+
+    <div class="selector-row">
+      <span class="label">模式：</span>
+      <select id="modeSelect"></select>
+    </div>
+
+    <div class="pills" id="modePills"></div>
+  </div>
+
+  <div class="panel" id="resultPanel">
+    <div class="result-head">
+      <div class="result-title" id="resultTitle">
+        請選擇呼吸器與 Mode
+      </div>
+      <div class="badges" id="resultBadges"></div>
+    </div>
+
+    <div class="cards" id="resultCards"></div>
+
+    <div class="note">
+      本頁資料依呼吸器 Master Database 建立，供 RT 臨床教學、設定對照與品質管理使用。
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  QC Ventilator Master Database 2026 · 147 Device × Mode records
+</footer>
+
+<script>
+
+const DATA=[{"group":"成人呼吸器","device":"","mode":"SPONT-PSV","settings":"PS, FiO2,PEEP,                                                Trigger,Esens, Max Pressure Limit","alarms":"HPL, Low TV, Low VE, Apnea Time","measurements":"Vte spon, total RR , PIP, MAP, VE spont , PEEP, FiO2, Temp,cuff                                                                      (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"SPON-TC","settings":"Tube Type (ET/Trach), Tube Size,                        TC Compensation  (1-100%),  FiO2, PEEP Trigger,Esens,Max Pressure Limit,Max VTI Limit","alarms":"HPL, Low TV, Low VE, Apnea Time,Max VTI Limit","measurements":"Vte spon, total RR , PIP, MAP, VE spont ,I:E, PEEP, FiO2, Temp,cuff                                                                      (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"SPON-VS","settings":"VTsupport (VTtarget),FiO2, PEEP,                   Trigger,Rise Time,Esens,Max Pressure Limit,Max VTI","alarms":"HPL, Low TV, Low VE, Apnea Time,Max VTI Limit","measurements":"Vte spon, total RR , PIP, MAP, VE spont , PEEP, FiO2, Temp,cuff                                                                      (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"Spon-PAV+","settings":"Tube Type (ET/Trach), Tube Size,                         % Supp , FiO2, PEEP , Trigger, Esens, Max Pressure Limit,Max VTI Limit","alarms":"HPL, Low TV, Low VE, Apnea Time,Max VTI Limit","measurements":"Vte spon, total RR , PIP, MAP, VE spont , PEEP, FiO2, Temp,cuff                                                                      (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"BiLevel","settings":"RR,PEEP high, PEEP low,T high ,PS ,FiO2,         Trigger,Rise Time,Esens,Max Pressure Limit","alarms":"HPL, Low TV,Low TV(spon), Low VE, Apnea Time","measurements":"Vte, Vte spon, set RR, total RR , PIP, MAP, VE tot, VE spont ,I:E ,PEEP, FiO2, Temp, cuff                                           (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"Dräger Savina 300","mode":"VC-AC/CMV","settings":"FiO2,VT, Ti,RR,Flow, PEEP,                               Pmax ,Trigger","alarms":"HPL, Low VE, Apnea Time","measurements":"set Vti, Vte, set RR,total RR, PIP, MAP,VE, I:E,PEEP,FiO2, Temp, cuff                                                                                        
+ (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"VC-SIMV+PS","settings":"FiO2,VT, Ti,RR,Flow, PEEP,  PS ,                      Pmax, Trigger,Insp.tern,apnea backup setting(TV/RR)","alarms":"HPL, Low VE, Apnea Time","measurements":"set Vti, Vte, Vte spon, set RR, total RR , PIP, MAP, VE tot, VE spont ,I:E, PEEP, FiO2, Temp, cuff                                     (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"VC/MMV","settings":"FiO2,VT, Ti,RR,Flow, PEEP,  PS ,                      Pmax, Trigger,Insp.tern,apnea backup setting(TV/RR)","alarms":"HPL, Low VE, Apnea Time","measurements":"set Vti, Vte, Vte spon, set RR, total RR , PIP, MAP, VE tot, VE spont ,I:E, PEEP, FiO2, Temp, cuff                                     (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"PC-AC","settings":"FiO2,Ti,RR ,Pinsp,Flow, PEEP,                         Pmax,Trigger","alarms":"HPL, Low VE, Apnea Time","measurements":"Vte, set RR, total RR , PIP, MAP,  VE, I:E, PEEP, FiO2,     Temp, cuff
+ (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"PC-SIMV+PS","settings":"FiO2,Ti,RR ,Flow,Pinsp,PEEP,   PS                      Pmax,Trigger,Insp.tern","alarms":"HPL, Low VE, Apnea Time","measurements":"Vte, Vte spon, set RR, total RR , PIP, MAP, VE tot, VE spont, I:E ,PEEP, FiO2, Temp, cuff                                    (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"PC-APRV","settings":"FiO2, Thigh, Tlow,Flow,Phigh, Plow, apnea backup setting (TV/RR/PEEP)","alarms":"HPL, Low VE, Apnea Time","measurements":"Vte, set RR, total RR , PIP, MAP, VE, PEEP, FiO2, I:E,Temp, cuff (Cst, Raw, Pplat : 2times/wk、ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"SPN-CPAP/PS","settings":"FiO2,Flow,PEEP, PS,                                      Trigger, Insp.tern,apnea backup setting(TV/RR/PEEP)","alarms":"HPL, Low VE, Apnea Time","measurements":"Vte, total RR , PIP, MAP,  VE, I:E, PEEP, FiO2, Temp, cuff
+ (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"SPN-CPAP/ATC","settings":"Tube Type (ET/Trach), Tube Size, ATC(on/off), PEEP, FiO2","alarms":"HPL, Low VE, Apnea Time","measurements":"Vte spon, total RR , PIP, MAP, VE spont , PEEP, FiO2, Temp,cuff                                                                      (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"Dräger Evita V800","mode":"VC-AC","settings":"FiO2, VT,  Ti, RR ,PEEP,Flow ,Trigger","alarms":"HPL, Low VE, Apnea Time","measurements":"set Vti, Vte, set RR,total RR, PIP, MAP,VE, I:E,PEEP,FiO2, Temp, cuff                                                                                        
+ (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"PC-AC","settings":"FiO2,Pinsp, Ti,RR, PEEP, FiO2, Trigger, Slope","alarms":"HPL, Low VE, Low TV,Apnea Time","measurements":"Vte, set RR, total RR , PIP, MAP,  VE, I:E, PEEP, FiO2,     Temp, cuff
+ (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"PC-SIMV+PS","settings":"FiO2,Pinsp, Ti,RR,  PEEP, FiO2, ∆Psupp, Slope,Trigger, Insp trem,apnea backup setting(TV/RR)","alarms":"HPL, Low VE, Low TV,Apnea Time","measurements":"Vte, Vte spon, set RR, total RR , PIP, MAP, VE tot, VE spont, I:E ,PEEP, FiO2, Temp, cuff                                    (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"SPN-CPAP/PS","settings":"FiO2, PEEP, ∆Psupp, Slope,                          Trigger, Insp trem,apnea backup setting(TV/RR)","alarms":"HPL, Low VE, Apnea Time","measurements":"Vte,  total RR , PIP, MAP, VE, I:E, PEEP, FiO2, Temp, cuff
+ (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"PC-CMV","settings":"FiO2,Pinsp, Ti,RR,  PEEP, FiO2,Slop","alarms":"HPL, Low VE, Low TV,Apnea Time","measurements":"Vte, set RR, total RR , PIP, MAP,  VE, I:E, PEEP, FiO2,     Temp, cuff  (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"VC-CMV","settings":"FiO2, VT,  Ti, RR ,PEEP,Flow","alarms":"HPL, Low VE, Apnea Time","measurements":"set Vti, Vte, set RR,total RR, PIP, MAP,VE, I:E,PEEP,FiO2, Temp, cuff , (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"VC-SIMV+PS","settings":"FiO2,TV, Ti, RR,  PEEP,  ∆Psupp, Slope, Flow, Trigger, Insp trem,apnea backup setting(TV/RR)","alarms":"HPL, Low VE, Apnea Time","measurements":"set Vti, Vte, Vte spon, set RR, total RR , PIP, MAP, VE tot, VE spont ,I:E, PEEP, FiO2, Temp, cuff                                     (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"PC-SIMV+","settings":"FiO2,Pinsp, Ti,RR,  PEEP,  ∆Psupp, Slope,Trigger,Insp trem,apnea backup setting(TV/RR)","alarms":"HPL, Low VE, Low TV,Apnea Time","measurements":"Vte, Vte spon, set RR, total RR , PIP, MAP, VE tot, VE spont, I:E ,PEEP, FiO2, Temp, cuff                                    (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"PC-APRV","settings":"FiO2,Phigh, Plow,Thigh,Tlow                    Slope,apnea backup setting(TV/RR)","alarms":"HPL, Low VE, Low TV,Apnea Time","measurements":"Vte, set RR, total RR , PIP, MAP,  VE, I:E, PEEP, FiO2,     Temp, cuff  (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"SPN-PPS","settings":"FiO2, Flow assist ,Volume assis,PEEP,   Trigger,Insp trem,apnea backup setting(TV/RR)","alarms":"HPL, Low VE, Low TV,Apnea Time","measurements":"Vte, total RR , PIP, MAP,  VE, PEEP, FiO2, Temp, cuff
+ (Cst, Raw, Pplat : 2times/wk,ARDS*qd)","assessment":"Breath Sound , Secretion Quality (平日至少 1次/日),SpO2 (每筆紀錄必填)"},{"group":"成人呼吸器","device":"","mode":"SPN-CPAP/VS","settings":"FiO2,TV, PEEP, Slope,                           Trigger,Insp trem,apnea backup setting(TV/RR
