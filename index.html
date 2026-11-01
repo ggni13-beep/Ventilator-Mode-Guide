@@ -208,9 +208,9 @@ function additionalFunction(r){
 function renderMeasurements(value){
  const raw=String(value||'').trim();
  if(!raw)return '<div class="text-box">尚無資料</div>';
- const notePattern=/\\(?\\s*Cst\\s*[,，、]\\s*Raw\\s*[,，、]\\s*Pplat\\s*[:：]\\s*2\\s*times\\s*\\/\\s*wk\\s*[,，]\\s*ARDS\\s*\\*\\s*qd\\s*\\)?/i;
+ const notePattern=/\(?\s*Cst\s*[,，、]\s*Raw\s*[,，、]\s*Pplat\s*[:：]\s*2\s*times\s*\/\s*wk\s*[,，]\s*ARDS\s*\*\s*qd\s*\)?/i;
  const hasNote=notePattern.test(raw);
- const metrics=raw.replace(notePattern,'').replace(/[\\r\\n]+/g,' ').split(/[,，、]/).map(x=>x.trim()).filter(Boolean);
+ const metrics=raw.replace(notePattern,'').replace(/[\r\n]+/g,' ').split(/[,，、]/).map(x=>x.trim()).filter(Boolean);
  const chipsHtml=metrics.map(x=>'<span class="measurement-chip">'+escapeHtml(x)+'</span>').join('');
  const alertHtml=hasNote?'<div class="measurement-alert">Cst、Raw、Pplat 測量時機：2times /wk，ARDS * QD</div>':'';
  return '<div class="measurement-chips">'+(chipsHtml||'<span class="measurement-chip">尚無資料</span>')+'</div>'+alertHtml;
@@ -227,7 +227,7 @@ function renderResult(){
  <div class="vent-info-grid">
    <article class="info-card settings"><h4>⚙️ 呼吸器設定值 (Control Settings)</h4>${chips(r.settings)}${additionalFunction(r)}</article>
    <article class="info-card alarm"><h4>🔔 警示設定 (Alarm Limits)</h4>${chips(r.alarms)}</article>
-   <article class="info-card measure" id="measurements"><h4>📊 臨床監測數據 (Measurements)</h4><div class="text-box">${renderMeasurements(r.measurements)}</div></article>
+   <article class="info-card measure" id="measurements"><h4>📊 臨床監測數據 (Measurements)</h4>${renderMeasurements(r.measurements)}</article>
    <article class="info-card assess" id="assessment"><h4>🩺 理學與臨床評估 (Physical Assessment)</h4><div class="text-box">${escapeHtml(r.assessment)||'尚無資料'}</div></article>
  </div>
  <div class="module-footer">資料來源：QC-ventilator_complete_master_with_measurements_2026.xlsx</div>`;
