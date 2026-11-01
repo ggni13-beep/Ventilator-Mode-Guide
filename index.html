@@ -163,14 +163,43 @@ function chips(value){
 }
 function additionalFunction(r){
  const d=r.device,m=r.mode,has=(...names)=>names.includes(m);let title='',items=[],note='';
- if(d==="Puritan Bennett (PB) 980"&&has("SPON-PSV","Spon-PAV+")){title="TC（Tube Compensation）";items=["TC Compensation（1–100%）"];note="適用於此 spontaneous mode；實際可用項目與範圍請依設備軟體版本及原廠操作手冊確認。";}
- else if(d==="Dräger Savina 300"&&m==="SPN-CPAP/PS"){title="ATC（Automatic Tube Compensation）";items=["ATC：ON / OFF",];note="ATC 作為 SPN-CPAP/PS 的附加功能呈現；未將 ATC 列為獨立通氣模式。";}
- else if(d==="G5"&&has("SPONT/PSV","(P)SIMV+PS","(V)SIMV+PS","DuoPAP","APRV")){title="TRC（Tube Resistance Compensation）";items=["Tube ID","Compensation（%）"];note="SIMV、DuoPAP、APRV 僅表示可在符合條件的自發呼吸階段評估此功能；各模式可用性需依 G5 軟體版本確認。";}
- else if(d==="Dräger Evita V800"&&has("SPN-CPAP/PS","SPN-PPS","SPN-CPAP/VS","PC-SIMV+PS","VC-SIMV+PS","PC-SIMV+","PC-APRV","VC-MMV")){title="ATC（Automatic Tube Compensation）";items=["ATC：ON / OFF","Compensation（0–100%）","Inspiratory scope：Spon+Mand / Only Spon","Expiratory compensation：ON / OFF"];note="SIMV、APRV、MMV 等模式仍須依呼吸型態、補償範圍及設備設定確認。";}
- else if(d==="Dräger Babylog VN500"&&has("PC-SIMV+PS","PSV","SPN-CPAP/PS          (Non-invasive)")){title="ATC（Automatic Tube Compensation）";items=["ATC：ON / OFF","Inspiratory scope：Spon / Spon+Mand","Expiratory compensation：ON / OFF"];note="僅在原廠支援的侵入性氣道及呼吸型態下使用；此處列為附加功能，不另增 Mode。";}
- else if(d==="GE Engstrom / CARESCAPE R860"&&has("A/C PC","SIMV/PC+PS","BiLevel","APRV","CPAP/PS")){title="ARC / Tube Compensation";items=["Engström：ARC（ETT / Tr. size、Compensation %）","CARESCAPE R860：Tube Compensation"];note="資料庫目前將 Engström 與 R860 合併為同一 Device 選項，兩機型功能名稱及參數不同；請依實際機型及軟體版本核對。";}
- else if(d==="Nihon Kohden NKV-550"&&has("A/C (PC)","PC-SIMV+PS","SPONT/PS","SPONT/APRV","SPONT/CPAP")){title="Tube Compensation";items=["Tube Compensation：ON / OFF","Tube ID（2.0–10.0 mm）","Compensation（0–100%）"];note="先列於壓力控制及自發呼吸相關模式；PRVC、VS 等模式不在本次標示範圍。請依軟體版本及原廠手冊核對。";}
- if(!title)return '';return '<div class="additional-function"><div class="additional-function-title">＋ Additional Function｜'+escapeHtml(title)+'</div><div class="chips">'+items.map(x=>'<span class="chip">'+escapeHtml(x)+'</span>').join('')+'</div><div class="additional-function-note">'+escapeHtml(note)+'</div></div>';
+ if(d==="Puritan Bennett (PB) 980"&&has("SPON-PSV","Spon-PAV+")){
+   title="TC（Tube Compensation）";
+   items=["TC Compensation（1–100%）"];
+   note="適用於此 spontaneous mode；實際可用範圍請依設備軟體版本及原廠操作手冊確認。";
+ }
+ else if(d==="Dräger Savina 300"&&m==="SPN-CPAP/PS"){
+   title="ATC（Automatic Tube Compensation）";
+   items=["ATC：ON / OFF"];
+   note="ATC 作為 SPN-CPAP/PS 的附加功能呈現；未將 ATC 列為獨立通氣模式。";
+ }
+ else if(d==="G5"&&has("SPONT/PSV","(P)SIMV+PS","(V)SIMV+PS","DuoPAP","APRV")){
+   title="TRC（Tube Resistance Compensation）";
+   items=["Compensation（%）"];
+   note="SIMV、DuoPAP、APRV 僅表示可在符合條件的自發呼吸階段評估此功能；各模式可用性需依 G5 軟體版本確認。";
+ }
+ else if(d==="Dräger Evita V800"&&has("SPN-CPAP/PS","SPN-PPS","SPN-CPAP/VS","PC-SIMV+PS","VC-SIMV+PS","PC-SIMV+","PC-APRV","VC-MMV")){
+   title="ATC（Automatic Tube Compensation）";
+   items=["ATC：ON / OFF","Compensation（0–100%）"];
+   note="依設備設定及軟體版本確認各模式中的 ATC 可用性。";
+ }
+ else if(d==="Dräger Babylog VN500"&&has("PC-SIMV+PS","PSV","SPN-CPAP/PS          (Non-invasive)")){
+   title="ATC（Automatic Tube Compensation）";
+   items=["ATC：ON / OFF","Inspiratory scope：Spon / Spon+Mand","Expiratory compensation：ON / OFF"];
+   note="僅在原廠支援的侵入性氣道及呼吸型態下使用；此處列為附加功能，不另增 Mode。";
+ }
+ else if(d==="GE Engstrom / CARESCAPE R860"&&has("A/C PC","SIMV/PC+PS","BiLevel","APRV","CPAP/PS")){
+   title="ARC（Airway Resistance Compensation）";
+   items=["Engström：ARC Compensation（%）","CARESCAPE R860：ARC Compensation（%）"];
+   note="資料庫目前將 Engström 與 CARESCAPE R860 合併為同一 Device 選項；請依實際機型及軟體版本核對 ARC 功能與可用模式。";
+ }
+ else if(d==="Nihon Kohden NKV-550"&&has("A/C (PC)","PC-SIMV+PS","SPONT/PS","SPONT/APRV","SPONT/CPAP")){
+   title="Tube Compensation";
+   items=["Tube Compensation：ON / OFF","Compensation（0–100%）"];
+   note="先列於壓力控制及自發呼吸相關模式；PRVC、VS 等模式不在本次標示範圍。請依軟體版本及原廠手冊核對。";
+ }
+ if(!title)return '';
+ return '<div class="additional-function"><div class="additional-function-title">＋ Additional Function｜'+escapeHtml(title)+'</div><div class="chips">'+items.map(x=>'<span class="chip">'+escapeHtml(x)+'</span>').join('')+'</div><div class="additional-function-note">'+escapeHtml(note)+'</div></div>';
 }
 function renderResult(){
  const r=DATA.find(x=>x.group===currentGroup&&x.device===currentDevice&&x.mode===currentMode);
