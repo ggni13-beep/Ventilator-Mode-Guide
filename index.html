@@ -61,6 +61,10 @@ select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
 .additional-function-note{font-size:10px;color:#9a3412;margin-top:6px;line-height:1.55}
 .alarm .chip{background:#fffaf3;border-color:#fed7aa}
 .text-box{padding:11px;border:1px solid #e2e8f0;border-radius:7px;background:#f8fafc;color:#475569;font-size:12px;line-height:1.75;white-space:pre-line}
+.measurement-chips{display:flex;flex-wrap:wrap;gap:7px}
+.measurement-chip{display:inline-flex;align-items:center;padding:6px 9px;border:1px solid #cbd5e1;border-radius:7px;background:#f8fafc;color:#334155;font-size:12px;line-height:1.35}
+.measurement-alert{display:block;margin-top:10px;padding:9px 11px;border:1px solid #fda4af;border-left:4px solid #dc2626;border-radius:7px;background:#fff1f2;color:#b91c1c;font-size:12px;font-weight:800;line-height:1.5}
+
 .module-footer{padding:0 16px 16px;color:#94a3b8;font-size:10px}
 .empty{padding:35px;text-align:center;color:#94a3b8}
 
@@ -201,6 +205,16 @@ function additionalFunction(r){
  if(!title)return '';
  return '<div class="additional-function"><div class="additional-function-title">＋ Additional Function｜'+escapeHtml(title)+'</div><div class="chips">'+items.map(x=>'<span class="chip">'+escapeHtml(x)+'</span>').join('')+'</div><div class="additional-function-note">'+escapeHtml(note)+'</div></div>';
 }
+function renderMeasurements(value){
+ const raw=String(value||'').trim();
+ if(!raw)return '<div class="text-box">尚無資料</div>';
+ const notePattern=/\\(?\\s*Cst\\s*[,，、]\\s*Raw\\s*[,，、]\\s*Pplat\\s*[:：]\\s*2\\s*times\\s*\\/\\s*wk\\s*[,，]\\s*ARDS\\s*\\*\\s*qd\\s*\\)?/i;
+ const hasNote=notePattern.test(raw);
+ const metrics=raw.replace(notePattern,'').replace(/[\\r\\n]+/g,' ').split(/[,，、]/).map(x=>x.trim()).filter(Boolean);
+ const chipsHtml=metrics.map(x=>'<span class="measurement-chip">'+escapeHtml(x)+'</span>').join('');
+ const alertHtml=hasNote?'<div class="measurement-alert">Cst、Raw、Pplat 測量時機：2times /wk，ARDS * QD</div>':'';
+ return '<div class="measurement-chips">'+(chipsHtml||'<span class="measurement-chip">尚無資料</span>')+'</div>'+alertHtml;
+}
 function renderResult(){
  const r=DATA.find(x=>x.group===currentGroup&&x.device===currentDevice&&x.mode===currentMode);
  const el=document.getElementById('ventilator');
@@ -213,7 +227,7 @@ function renderResult(){
  <div class="vent-info-grid">
    <article class="info-card settings"><h4>⚙️ 呼吸器設定值 (Control Settings)</h4>${chips(r.settings)}${additionalFunction(r)}</article>
    <article class="info-card alarm"><h4>🔔 警示設定 (Alarm Limits)</h4>${chips(r.alarms)}</article>
-   <article class="info-card measure" id="measurements"><h4>📊 臨床監測數據 (Measurements)</h4><div class="text-box">${escapeHtml(r.measurements)||'尚無資料'}</div></article>
+   <article class="info-card measure" id="measurements"><h4>📊 臨床監測數據 (Measurements)</h4><div class="text-box">${renderMeasurements(r.measurements)}</div></article>
    <article class="info-card assess" id="assessment"><h4>🩺 理學與臨床評估 (Physical Assessment)</h4><div class="text-box">${escapeHtml(r.assessment)||'尚無資料'}</div></article>
  </div>
  <div class="module-footer">資料來源：QC-ventilator_complete_master_with_measurements_2026.xlsx</div>`;
