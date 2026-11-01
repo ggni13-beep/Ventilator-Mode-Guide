@@ -121,7 +121,7 @@ const groups=[...new Set(DATA.map(x=>x.group))];
 let currentGroup=groups[0], currentDevice='', currentMode='';
 
 const unique=a=>[...new Set(a)];
-const splitItems=s=>String(s||'').split(/[，]/).map(x=>x.trim()).filter(Boolean).flatMap(x=>/^PEEP\s+Trigger$/i.test(x)?['PEEP','Trigger']:[x]);
+const splitItems=s=>String(s||'').split(/[,，]/).map(x=>x.trim()).filter(Boolean).flatMap(x=>/^PEEP\s+Trigger$/i.test(x)?['PEEP','Trigger']:[x]);
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
 function makeButton(cls,text,active,onClick){const b=document.createElement('button');b.type='button';b.className=cls+(active?' active':'');b.textContent=text;b.style.pointerEvents='auto';b.style.touchAction='manipulation';b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();if(typeof onClick==='function')onClick();});return b;}
 
